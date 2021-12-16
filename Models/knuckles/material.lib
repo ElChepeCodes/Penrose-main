@@ -1,0 +1,256 @@
+# Aspose.3D Wavefront OBJ Exporter
+# Copyright 2004-2021 Aspose Pty Ltd.
+# File created: 11/22/2021 18:06:58
+
+newmtl attach_0034EA64_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_eye2.png
+newmtl attach_0034E7D4_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_eye2.png
+newmtl attach_0034E5E0_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_0034C230_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034BBE8_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034B7B8_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034B5EC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034B17C_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034AF14_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_0034AD8C_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_0034AAE8_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034A6EC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034A520_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_0034A0CC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_siro.png
+newmtl attach_00349E64_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00349CDC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00349A38_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_003496FC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_shoose2.png
+newmtl attach_00349334_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_shoose2.png
+newmtl attach_00349070_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00348EE8_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00348C5C_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00348920_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_shoose2.png
+newmtl attach_00348558_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_shoose2.png
+newmtl attach_00348288_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00348100_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00347EDC_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
+newmtl attach_00347B5C_material_0
+	Ka 0.2 0.2 0.2
+	Kd 0.8 0.8 0.8
+	d 1
+	Tr 0
+	illum 2
+	Ks 0.2 0.2 0.2
+	Ns 20
+	map_Kd ktx_aka.png
