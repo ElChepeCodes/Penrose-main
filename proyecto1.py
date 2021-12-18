@@ -9,9 +9,12 @@ import random
 from PIL import Image
 from camera import Camera
 from tiles import RobinsonTriangle, BtileL, BtileS, PenroseP3
-from ObjLoader import ObjLoader
 from pyrr.objects.vector3 import Vector3
 
+
+#print controls
+print("Use wasd and mouse to control camera, shift to go up and control to go down")
+print("Use arrow keys to move light cube, pgUp to go up and pgDown to go down")
 cam = Camera()
 cubeCam = Camera()
 width = 1200
@@ -396,17 +399,24 @@ def main():
     PENROSE_FRAGMENT_SHADER = open(os.path.join("shaders/penrose.frag"), 'r').read()
     CUBE_VERTEX_SHADER = open(os.path.join("shaders/cube.vert"), 'r').read()
     CUBE_FRAGMENT_SHADER = open(os.path.join("shaders/cube.frag"), 'r').read()
+    LIGHT_CUBE_VERTEX_SHADER = open(os.path.join("shaders/light_cube.vert"), 'r').read()
+    LIGHT_CUBE_FRAGMENT_SHADER = open(os.path.join("shaders/light_cube.frag"), 'r').read()
     MENU_VERTEX_SHADER = open(os.path.join("shaders/overlay.vert"), 'r').read()
     MENU_FRAGMENT_SHADER = open(os.path.join("shaders/overlay.frag"), 'r').read()
+    LIGHT_VERTEX_SHADER = open(os.path.join("shaders/multiple_lights.vert"), 'r').read()
+    LIGHT_FRAGMENT_SHADER = open(os.path.join("shaders/multiple_lightsTransparency.frag"), 'r').read()
     # Compile The Program and shaders
 
     penrose_shader =  OpenGL.GL.shaders.compileProgram(OpenGL.GL.shaders.compileShader(PENROSE_VERTEX_SHADER,GL_VERTEX_SHADER),
                                              OpenGL.GL.shaders.compileShader(PENROSE_FRAGMENT_SHADER, GL_FRAGMENT_SHADER), validate=False)
     cube_shader =  OpenGL.GL.shaders.compileProgram(OpenGL.GL.shaders.compileShader(CUBE_VERTEX_SHADER,GL_VERTEX_SHADER),
                                              OpenGL.GL.shaders.compileShader(CUBE_FRAGMENT_SHADER, GL_FRAGMENT_SHADER), validate=False)
+    light_cube_shader =  OpenGL.GL.shaders.compileProgram(OpenGL.GL.shaders.compileShader(LIGHT_CUBE_VERTEX_SHADER,GL_VERTEX_SHADER),
+                                             OpenGL.GL.shaders.compileShader(LIGHT_CUBE_FRAGMENT_SHADER, GL_FRAGMENT_SHADER), validate=False)
     menu_shader = OpenGL.GL.shaders.compileProgram(OpenGL.GL.shaders.compileShader(MENU_VERTEX_SHADER,GL_VERTEX_SHADER),
                                              OpenGL.GL.shaders.compileShader(MENU_FRAGMENT_SHADER, GL_FRAGMENT_SHADER), validate=False)
-
+    lighting_shader = OpenGL.GL.shaders.compileProgram(OpenGL.GL.shaders.compileShader(LIGHT_VERTEX_SHADER,GL_VERTEX_SHADER),
+                                             OpenGL.GL.shaders.compileShader(LIGHT_FRAGMENT_SHADER, GL_FRAGMENT_SHADER), validate=False)
     #Configure penrose shaders
 
     #Create Buffers in gpu
@@ -435,8 +445,9 @@ def main():
     glEnableVertexAttribArray(position)
     glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 0, None)
 
-    #cube
+    #lightcube
     glUseProgram(cube_shader)
+    
     vertices = [-0.5, -0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
                 0.5, -0.5,  0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
                 0.5,  0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
@@ -473,7 +484,7 @@ def main():
             12, 13, 14, 14, 15, 12,
             16, 17, 18, 18, 19, 16,
             20, 21, 22, 22, 23, 20]
-
+    
     vertices = np.array(vertices, dtype=np.float32)
     indices = np.array(indices, dtype=np.uint32)
 
@@ -498,7 +509,7 @@ def main():
     glEnableVertexAttribArray(2)
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertices.itemsize * 8, ctypes.c_void_p(24))
 
-    textures = glGenTextures(2)
+    textures = glGenTextures(3)
     glBindTexture(GL_TEXTURE_2D, textures[0])
 
     # Set the texture wrapping parameters
@@ -509,7 +520,7 @@ def main():
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
     # load image
-    image = Image.open("textures/box-texture.jpg")
+    image = Image.open("textures/container2.png")
     image = image.transpose(Image.FLIP_TOP_BOTTOM)
     img_data = image.convert("RGBA").tobytes()
     # img_data = np.array(image.getdata(), np.uint8) # second way of getting the raw image data
@@ -524,26 +535,67 @@ def main():
     rotation_loc = glGetUniformLocation(cube_shader, "rotation")
     projection = pyrr.matrix44.create_perspective_projection_matrix(45, width / height, .1, 500)
 
+    #cube
+    vertices2 = [-0.5, -0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                0.5, -0.5,  0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                0.5,  0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                -0.5,  0.5,  0.5,  1.0, 1.0, 1.0,  0.0, 1.0,
 
-    #menu
-    #glUseProgram(menu_shader)
-    toggleRectangle = [  -1, -1, 
-                        -1, -.6, 
-                        -.3, -.6,
-                        -.3, -.6, 
-                        -.3, -1,
-                        -1, -1] 
-    toggleVertices = np.array(toggleRectangle, dtype=np.float32)
-    VAOMenuToggle = glGenVertexArrays(1)
-    VBOMenuToggle = glGenBuffers(1)
-    glBindVertexArray(VAOMenuToggle)
-    glBindBuffer(GL_ARRAY_BUFFER, VBOMenuToggle)
-    glBufferData(GL_ARRAY_BUFFER, toggleVertices.nbytes, toggleVertices, GL_STATIC_DRAW)
+                -0.5, -0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                0.5, -0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                0.5,  0.5, -0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                -0.5,  0.5, -0.5,  1.0, 1.0, 1.0,  0.0, 1.0,
 
-    a_position = glGetAttribLocation(menu_shader, "a_position")
-    glEnableVertexAttribArray(a_position)
-    glVertexAttribPointer(a_position, 2, GL_FLOAT, GL_FALSE, 0, None)
+                0.5, -0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                0.5,  0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                0.5,  0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                0.5, -0.5,  0.5,  1.0, 1.0, 1.0,  0.0, 1.0,
 
+                -0.5,  0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                -0.5, -0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                -0.5, -0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                -0.5,  0.5,  0.5,  1.0, 1.0, 1.0,  0.0, 1.0,
+
+                -0.5, -0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                0.5, -0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                0.5, -0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                -0.5, -0.5,  0.5,  1.0, 1.0, 1.0,  0.0, 1.0,
+
+                0.5,  0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
+                -0.5,  0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
+                -0.5,  0.5,  0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
+                0.5,  0.5,  0.5,  1.0, 1.0, 1.0,  0.0, 1.0]
+
+    indices2 = [0,  1,  2,  2,  3,  0,
+            4,  5,  6,  6,  7,  4,
+            8,  9, 10, 10, 11,  8,
+            12, 13, 14, 14, 15, 12,
+            16, 17, 18, 18, 19, 16,
+            20, 21, 22, 22, 23, 20]
+    
+    vertices2 = np.array(vertices, dtype=np.float32)
+    indices2 = np.array(indices, dtype=np.uint32)
+
+    VAOCube2 = glGenVertexArrays(1)
+    VBOCube2 = glGenBuffers(1)
+    glBindVertexArray(VAOCube2)
+    glBindBuffer(GL_ARRAY_BUFFER, VBOCube2)
+    glBufferData(GL_ARRAY_BUFFER, vertices2.nbytes, vertices2, GL_STATIC_DRAW)
+    
+
+    # Element Buffer Object
+    EBO2 = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2)
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices2.nbytes, indices2, GL_STATIC_DRAW)
+
+    glEnableVertexAttribArray(0)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertices2.itemsize * 8, ctypes.c_void_p(0))
+
+    glEnableVertexAttribArray(1)
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertices2.itemsize * 8, ctypes.c_void_p(12))
+
+    glEnableVertexAttribArray(2)
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertices2.itemsize * 8, ctypes.c_void_p(24))
 
     glBindTexture(GL_TEXTURE_2D, textures[1])
 
@@ -555,18 +607,75 @@ def main():
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
     # load image
-    imageToggle = Image.open("textures/toggleM.png")
+    image = Image.open("textures/container2_specular.png")
+    image = image.transpose(Image.FLIP_TOP_BOTTOM)
+    img_data = image.convert("RGBA").tobytes()
+    # img_data = np.array(image.getdata(), np.uint8) # second way of getting the raw image data
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_data)
+
+    
+    glClearColor(0.1, 0.1, 0.1, 1)
+    #glEnable(GL_DEPTH_TEST)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    rotation_loc = glGetUniformLocation(cube_shader, "rotation")
+    projection = pyrr.matrix44.create_perspective_projection_matrix(45, width / height, .1, 500)
+
+    #menu
+    glUseProgram(menu_shader)
+    toggleRectangle = [ -1.0, -1.0, 0.0,    0.0, 0.0,
+                        -1.0, -0.6, 0,0,    0.0, 1.0,
+                        -0.3, -0.6, 0,0,    1.0, 1.0,
+                        -0.3, -1.0, 0,0,    1.0, 0.0
+    ] 
+    toggleIndices = [
+        0,1,2,
+        2,3,0
+    ]
+    
+    toggleVertices = np.array(toggleRectangle, dtype=np.float32)
+    toggleIndices = np.array(toggleIndices, dtype=np.float32)
+
+    VAOMenuToggle = glGenVertexArrays(1)
+    VBOMenuToggle = glGenBuffers(1)
+
+    glBindVertexArray(VAOMenuToggle)
+    glBindBuffer(GL_ARRAY_BUFFER, VBOMenuToggle)
+    glBufferData(GL_ARRAY_BUFFER, toggleVertices.nbytes, toggleVertices, GL_STATIC_DRAW)
+
+    EBOMenu = glGenBuffers(1)
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOMenu)
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, toggleIndices.nbytes, toggleIndices, GL_STATIC_DRAW)
+
+    glEnableVertexAttribArray(0)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, toggleVertices.itemsize * 5, ctypes.c_void_p(0))
+
+    glEnableVertexAttribArray(1)
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, toggleVertices.itemsize * 5, ctypes.c_void_p(8))
+
+    glBindTexture(GL_TEXTURE_2D, textures[2])
+
+    # Set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    # Set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+    # load image
+    imageToggle = Image.open("textures/white.png")
     imageToggle = imageToggle.transpose(Image.FLIP_TOP_BOTTOM)
     img_dataToggle = imageToggle.convert("RGBA").tobytes()
     # img_data = np.array(image.getdata(), np.uint8) # second way of getting the raw image data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageToggle.width, imageToggle.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_dataToggle)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageToggle.width, imageToggle.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_dataToggle)
+    
 
     #render loop
     while not glfw.window_should_close(window):
         glfw.poll_events()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glEnable(GL_LIGHT0)
-        glEnable(GL_LIGHTING)
+        
         
         #get current run time in seconds for current loop
         currentTime = glfw.get_time()
@@ -575,25 +684,65 @@ def main():
         do_movement()
         view = cam.get_view_matrix()
         
+        #config lights
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [.1,.1,.1,1])
         #render cube
-        glUseProgram(cube_shader)
+        glUseProgram(light_cube_shader)
         glBindVertexArray(VAOCube)
+        rot_x = pyrr.Matrix44.from_x_rotation(0.5 * glfw.get_time())
+        rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time())
+
+        cubeView = glGetUniformLocation(light_cube_shader, "view");
+        cubeProjection = glGetUniformLocation(light_cube_shader, "projection");
+        cubeModel = glGetUniformLocation(light_cube_shader, "model");
+        cubeRot = glGetUniformLocation(light_cube_shader, "rotation");
+        cubeT = cubeMovement()
+        cubePos = pyrr.matrix44.create_from_translation(Vector3([-1,-1,1]))
+        glUniformMatrix4fv(cubeModel, 1, GL_FALSE, pyrr.matrix44.multiply(cubeT, cubePos))
+        glUniformMatrix4fv(cubeProjection, 1, GL_FALSE, projection)
+        glUniformMatrix4fv(cubeView, 1, GL_FALSE, view)
+        glUniformMatrix4fv(cubeRot, 1, GL_FALSE, pyrr.matrix44.multiply(rot_x, rot_y))
+
+        glDrawElements(GL_TRIANGLES, len(vertices) * 3, GL_UNSIGNED_INT, None)
+
+        glUseProgram(cube_shader)
+
+        #configure lights
+        ambientL = glGetAttribLocation(cube_shader, "lAmbient")
+        diffuseL = glGetAttribLocation(cube_shader, "lDiffuse")
+        specularL = glGetAttribLocation(cube_shader, "lSpecular")
+
+        materialS = glGetAttribLocation(cube_shader, "mShininess")
+
+        glUniform3fv(ambientL, 1, (.3, .3, .3))
+        glUniform3fv(diffuseL, 1, (.5, .5, .5))
+        glUniform3fv(specularL, 1, (1, 1, 1))
+        glUniform1f(materialS, 64)
+
+
+        glUniformMatrix4fv(cubeModel, 1, GL_FALSE, pyrr.matrix44.multiply(view, cubePos))
+
+        glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, textures[0])
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, textures[1])
+
+        glBindVertexArray(VAOCube2)
+        
         rot_x = pyrr.Matrix44.from_x_rotation(0.5 * glfw.get_time())
         rot_y = pyrr.Matrix44.from_y_rotation(0.8 * glfw.get_time())
 
         cubeView = glGetUniformLocation(cube_shader, "view");
         cubeProjection = glGetUniformLocation(cube_shader, "projection");
-        cubeTraslation = glGetUniformLocation(cube_shader, "traslation");
+        cubeModel = glGetUniformLocation(cube_shader, "model");
         cubeT = cubeMovement()
-        cubePos = pyrr.matrix44.create_from_translation(Vector3([0,0,-1]))
-        glUniformMatrix4fv(cubeTraslation, 1, GL_FALSE, pyrr.matrix44.multiply(cubeT, cubePos))
+        cubePos = pyrr.matrix44.create_from_translation(Vector3([0,0,0]))
+        glUniformMatrix4fv(cubeModel, 1, GL_FALSE, cubePos)
         glUniformMatrix4fv(cubeProjection, 1, GL_FALSE, projection)
         glUniformMatrix4fv(cubeView, 1, GL_FALSE, view)
         glUniformMatrix4fv(rotation_loc, 1, GL_FALSE, pyrr.matrix44.multiply(rot_x, rot_y))
 
-        glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-
+        glDrawElements(GL_TRIANGLES, len(vertices) * 3, GL_UNSIGNED_INT, None)
         #render penrose
         glUseProgram(penrose_shader)
 
@@ -639,18 +788,17 @@ def main():
         glUniform3fv(uniform, 1, (0.0, 0.0, 0.0))
 
 
-        #render lights
-        glLightfv(GL_LIGHT0, GL_AMBIENT, (1,1,1,1))
+        
         
 
         #render menu
         glUseProgram(menu_shader)
         glBindVertexArray(VAOMenuToggle)
-        glDisable(GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D, textures[1])
-        glDrawArrays(GL_TRIANGLES, 0, len(toggleVertices))
+        #glDisable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D, textures[2])
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, None)
         
-        glEnable(GL_BLEND)
+        #glEnable(GL_BLEND)
 
         glfw.swap_buffers(window)
     glfw.terminate()
